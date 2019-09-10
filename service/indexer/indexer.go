@@ -17,13 +17,13 @@ import (
 	"github.com/darkknightbk52/btc-indexer/subscriber"
 	"go.uber.org/zap"
 	"sync"
-	"time"
 )
 
 type Indexer struct {
 	config       Config
 	netParams    chaincfg.Params
 	currentBlock *model.Block
+	subscriber   subscriber.Subscriber
 	manager      store.Manager
 	client       client.Client
 }
@@ -32,11 +32,12 @@ const (
 	blockBatchSize = 50
 )
 
-func NewIndexer(config Config, manager store.Manager, client client.Client) *Indexer {
+func NewIndexer(config Config, subscriber subscriber.Subscriber, manager store.Manager, client client.Client) *Indexer {
 	return &Indexer{
-		config:  config,
-		manager: manager,
-		client:  client,
+		config:     config,
+		subscriber: subscriber,
+		manager:    manager,
+		client:     client,
 	}
 }
 
@@ -50,17 +51,11 @@ func (idx *Indexer) Listen(ctx context.Context, fromBlockHeight int64) error {
 	listenCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	var subOpts []subscriber.SubscriberOption
-	subOpts = append(subOpts, subscriber.BtcUrl(idx.config.Url))
-	if idx.config.TimeoutInSecond != 0 {
-		subOpts = append(subOpts, subscriber.TimeoutDuration(time.Duration(idx.config.TimeoutInSecond)*time.Second))
-	}
-	if idx.config.RetryTimeInSecond != 0 {
-		subOpts = append(subOpts, subscriber.RetryDuration(time.Duration(idx.config.RetryTimeInSecond)*time.Second))
-	}
-	sub := subscriber.NewSubscriber(subOpts...)
 	notiCh := make(chan interface{}, 100)
-	sub.SubscribeNotification(listenCtx, &wg, notiCh)
+	err = idx.subscriber.SubscribeNotification(listenCtx, &wg, notiCh)
+	if err != nil {
+		return fmt.Errorf("failed to Subscribe Notification: %v", err)
+	}
 
 	for {
 		select {
@@ -70,7 +65,7 @@ func (idx *Indexer) Listen(ctx context.Context, fromBlockHeight int64) error {
 		case noti := <-notiCh:
 			msg, ok := noti.([][]byte)
 			if !ok {
-				log.L().Warn("Unexpected Notification from Subscriber", zap.Any("Msg", msg))
+				log.L().Warn("Unexpected Notification from Subscriber", zap.Any("Noti", noti))
 				continue
 			}
 
@@ -334,7 +329,11 @@ func (idx *Indexer) initState(fromBlockHeight int64) error {
 		if err != nil {
 			return fmt.Errorf("failed to Get Block Header Verbose By Height '%d': %v", fromBlockHeight, err)
 		}
-		idx.currentBlock = common.ToBlock(header)
+		result, err := idx.addBlocks([]*btcjson.GetBlockHeaderVerboseResult{header})
+		if err != nil {
+			return fmt.Errorf("failed to Add Initial Block: %v", err)
+		}
+		idx.currentBlock = common.ToBlock(result)
 		return nil
 	}
 

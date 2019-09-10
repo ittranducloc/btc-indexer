@@ -11,7 +11,7 @@ import (
 )
 
 type Subscriber interface {
-	SubscribeNotification(ctx context.Context, wg *sync.WaitGroup, ch chan<- interface{})
+	SubscribeNotification(ctx context.Context, wg *sync.WaitGroup, ch chan<- interface{}) error
 }
 
 const (
@@ -37,9 +37,10 @@ func NewSubscriber(opts ...SubscriberOption) Subscriber {
 	}
 }
 
-func (s *subscriber) SubscribeNotification(ctx context.Context, wg *sync.WaitGroup, ch chan<- interface{}) {
+func (s *subscriber) SubscribeNotification(ctx context.Context, wg *sync.WaitGroup, ch chan<- interface{}) error {
 	go s.subscribe(ctx, wg, "rawblock", ch)
 	go s.subscribe(ctx, wg, "rawtx", ch)
+	return nil
 }
 
 func (s *subscriber) subscribe(ctx context.Context, wg *sync.WaitGroup, topic string, ch chan<- interface{}) {

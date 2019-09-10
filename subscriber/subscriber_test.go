@@ -48,7 +48,8 @@ func TestSubscribe(t *testing.T) {
 		}
 	}()
 
-	sub.SubscribeNotification(ctx, wg, ch)
+	err := sub.SubscribeNotification(ctx, wg, ch)
+	Expect(err).Should(Succeed())
 
 	select {}
 }
