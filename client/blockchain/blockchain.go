@@ -1,4 +1,4 @@
-package client
+package blockchain
 
 import (
 	"github.com/btcsuite/btcd/btcjson"

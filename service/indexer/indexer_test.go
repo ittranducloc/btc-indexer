@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/btcsuite/btcd/chaincfg"
-	clientMock "github.com/darkknightbk52/btc-indexer/client/mocks"
+	clientMock "github.com/darkknightbk52/btc-indexer/client/blockchain/mocks"
 	commonIndexer "github.com/darkknightbk52/btc-indexer/common"
 	"github.com/darkknightbk52/btc-indexer/common/log"
 	"github.com/darkknightbk52/btc-indexer/model"

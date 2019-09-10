@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package btcindexersrv;
+
+service BtcIndexer {
+    rpc Sync (stream SyncRequest) returns (stream SyncResponse);
+}
+
+// Request/Response messages
+message SyncRequest {
+    repeated Block recent_blocks = 1;
+}
+
+message SyncResponse {
+    message BeginStream {
+    }
+    message EndStream {
+    }
+    message SyncBlock {
+        Block block = 1;
+        repeated TxIn tx_ins = 2;
+        repeated TxOut tx_outs = 3;
+    }
+    message ReorgBlock {
+        int64 height = 1;
+        string old_hash = 2;
+        string new_hash = 3;
+    }
+
+    oneof response {
+        BeginStream begin_stream = 1;
+        EndStream end_stream = 2;
+        SyncBlock sync_block = 3;
+        ReorgBlock reorg_block = 4;
+    }
+}
+
+// Data messages
+message Block {
+    int64 height = 1;
+    string hash = 2;
+    string previous_hash = 3;
+}
+
+message TxIn {
+    string tx_hash = 1;
+    int32 tx_index = 2;
+    int64 height = 3;
+    string address = 4;
+    string previous_tx_hash = 5;
+    int32 previous_tx_index = 6;
+}
+
+message TxOut {
+    string tx_hash = 1;
+    int32 tx_index = 2;
+    int64 height = 3;
+    int64 value = 4;
+    string address = 5;
+    string script_pub_key = 6;
+    bool coin_base = 7;
+}

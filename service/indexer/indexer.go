@@ -9,7 +9,7 @@ import (
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
-	"github.com/darkknightbk52/btc-indexer/client"
+	bcClient "github.com/darkknightbk52/btc-indexer/client/blockchain"
 	"github.com/darkknightbk52/btc-indexer/common"
 	"github.com/darkknightbk52/btc-indexer/common/log"
 	"github.com/darkknightbk52/btc-indexer/model"
@@ -25,14 +25,14 @@ type Indexer struct {
 	currentBlock *model.Block
 	subscriber   subscriber.Subscriber
 	manager      store.Manager
-	client       client.Client
+	client       bcClient.Client
 }
 
 const (
 	blockBatchSize = 50
 )
 
-func NewIndexer(config Config, subscriber subscriber.Subscriber, manager store.Manager, client client.Client) *Indexer {
+func NewIndexer(config Config, subscriber subscriber.Subscriber, manager store.Manager, client bcClient.Client) *Indexer {
 	return &Indexer{
 		config:     config,
 		subscriber: subscriber,

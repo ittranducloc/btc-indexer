@@ -68,12 +68,51 @@ var (
 	johnPkScript = []byte{0x76, 0xa9, 0x14, 0x4b, 0x18, 0x71, 0x4f, 0x37, 0x35, 0x0, 0xbd, 0x90, 0xf3, 0x8d, 0x6e, 0xbf, 0x2c, 0xbd, 0x6b, 0xfb, 0xa5, 0x57, 0xf9, 0x88, 0xac}
 )
 
-func init() {
+func InitTestData() {
 	initGenesisBlock()
 	initBlock1()
 	initBlock2()
 	initBlock3()
 	initBlock4()
+	initReorgBlock3(modelBlocks[2].Hash)
+	initReorgBlock4(reorgModelBlocks[3].Hash)
+}
+
+func ModelBlocks() map[int64]*model.Block {
+	return modelBlocks
+}
+
+func ModelTxIns() map[int64][]*model.TxIn {
+	return modelTxIns
+}
+
+func ModelTxOuts() map[int64][]*model.TxOut {
+	return modelTxOuts
+}
+
+func ReorgModelBlocks() map[int64]*model.Block {
+	return reorgModelBlocks
+}
+
+func ReorgModelTxIns() map[int64][]*model.TxIn {
+	return reorgModelTxIns
+}
+
+func ReorgModelTxOuts() map[int64][]*model.TxOut {
+	return reorgModelTxOuts
+}
+
+func Addresses() []string {
+	return []string{
+		bobAddress,
+		aliceAddress,
+		mikeAddress,
+		johnAddress,
+	}
+}
+
+func init() {
+	InitTestData()
 }
 
 func initGenesisBlock() {

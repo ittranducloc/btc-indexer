@@ -1,12 +1,14 @@
 package common
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/darkknightbk52/btc-indexer/model"
+	proto "github.com/darkknightbk52/btc-indexer/proto"
 )
 
 func ToBlock(header *btcjson.GetBlockHeaderVerboseResult) *model.Block {
@@ -63,4 +65,38 @@ func GetAddrFromTxOut(out *wire.TxOut, chainParams *chaincfg.Params) (string, er
 		return model.NonStandardAddr, fmt.Errorf("failed to Extract Public Key Script: empty addresses")
 	}
 	return addrs[0].String(), nil
+}
+
+func BuildProtoMsg(height int64, block *model.Block, txIns []*model.TxIn, txOuts []*model.TxOut) *proto.SyncResponse_SyncBlock {
+	msg := new(proto.SyncResponse_SyncBlock)
+	msg.Block = &proto.Block{
+		Height:       block.Height,
+		Hash:         block.Hash,
+		PreviousHash: block.PreviousHash,
+	}
+
+	for _, txIn := range txIns {
+		msg.TxIns = append(msg.TxIns, &proto.TxIn{
+			TxHash:          txIn.TxHash,
+			TxIndex:         txIn.TxIndex,
+			Height:          txIn.Height,
+			Address:         txIn.Address,
+			PreviousTxHash:  txIn.PreviousTxHash,
+			PreviousTxIndex: txIn.PreviousTxIndex,
+		})
+	}
+
+	for _, txOut := range txOuts {
+		msg.TxOuts = append(msg.TxOuts, &proto.TxOut{
+			TxHash:       txOut.TxHash,
+			TxIndex:      txOut.TxIndex,
+			Height:       txOut.Height,
+			Value:        txOut.Value,
+			Address:      txOut.Address,
+			ScriptPubKey: hex.EncodeToString(txOut.ScriptPubKey),
+			CoinBase:     *txOut.CoinBase,
+		})
+	}
+
+	return msg
 }
