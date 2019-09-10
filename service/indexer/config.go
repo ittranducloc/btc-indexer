@@ -8,18 +8,18 @@ import (
 )
 
 type Config struct {
-	Network            string
-	IncludeNonStandard bool
-	Url                string
-	TimeoutInSecond    int
-	RetryTimeInSecond  int
+	IndexerNetwork            string
+	IndexerIncludeNonStandard bool
+	IndexerFullNodeUrl        string
+	IndexerTimeoutInSecond    int
+	IndexerRetryTimeInSecond  int
 }
 
 func (c Config) Validate() error {
 	var errContent string
 
-	if len(c.Network) > 0 {
-		_, err := common.GetChainParams(c.Network)
+	if len(c.IndexerNetwork) > 0 {
+		_, err := common.GetChainParams(c.IndexerNetwork)
 		if err != nil {
 			errContent = fmt.Sprintf("%s; %s", errContent, err.Error())
 		}
@@ -27,7 +27,7 @@ func (c Config) Validate() error {
 		errContent = fmt.Sprintf("%s; %s", errContent, "blockchain network required")
 	}
 
-	if len(c.Url) == 0 {
+	if len(c.IndexerFullNodeUrl) == 0 {
 		errContent = fmt.Sprintf("%s; %s", errContent, "Full Node URL required")
 	}
 
@@ -39,6 +39,6 @@ func (c Config) Validate() error {
 }
 
 func (c Config) ChainParams() chaincfg.Params {
-	params, _ := common.GetChainParams(c.Network)
+	params, _ := common.GetChainParams(c.IndexerNetwork)
 	return *params
 }

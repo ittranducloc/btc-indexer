@@ -3,7 +3,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:484964efb74912b8c164d49044f5b5a0af008a7143f49342c84f2c522480a253"
+  digest = "1:9ded297882ab8eaa5b47fd41216f8178b2b24c2367701503db5520f2c9fb181e"
   name = "github.com/btcsuite/btcd"
   packages = [
     "blockchain",
@@ -12,6 +12,7 @@
     "chaincfg",
     "chaincfg/chainhash",
     "database",
+    "rpcclient",
     "txscript",
     "wire",
   ]
@@ -37,6 +38,22 @@
   ]
   pruneopts = "UT"
   revision = "9e5f4b9a998d263e3ce9c56664a7816001ac8000"
+
+[[projects]]
+  branch = "master"
+  digest = "1:1e6b2f7aa98b082c30a1303c29a702c369b2ec6d86b74a599bc8bbe2333db299"
+  name = "github.com/btcsuite/go-socks"
+  packages = ["socks"]
+  pruneopts = "UT"
+  revision = "4720035b7bfd2a9bb130b1c184f8bbe41b6f0d0f"
+
+[[projects]]
+  branch = "master"
+  digest = "1:0b2242fd2f4f51fb491e97e204464f75da680897a0db10ec7554c87b71b5afc3"
+  name = "github.com/btcsuite/websocket"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "31079b6807923eb23992c421b114992b95131b55"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
@@ -455,6 +472,7 @@
     "github.com/btcsuite/btcd/btcjson",
     "github.com/btcsuite/btcd/chaincfg",
     "github.com/btcsuite/btcd/chaincfg/chainhash",
+    "github.com/btcsuite/btcd/rpcclient",
     "github.com/btcsuite/btcd/txscript",
     "github.com/btcsuite/btcd/wire",
     "github.com/golang/protobuf/proto",

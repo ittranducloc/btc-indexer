@@ -33,8 +33,8 @@ var _ = Describe("Sync Client test", func() {
 		mockManager = new(storeMocks.Manager)
 		client = &syncClient{
 			config: Config{
-				SafeDistance:          1,
-				GetBlockIntervalInSec: 1,
+				SyncClientSafeDistance:          1,
+				SyncClientGetBlockIntervalInSec: 1,
 			},
 			addressWatcher: mockAddressWatcher,
 			stream:         mockStream,
@@ -151,7 +151,7 @@ var _ = Describe("Sync Client test", func() {
 			mockStream.On("Recv").Return(nil, context.Canceled).Once()
 
 			go func() {
-				time.Sleep(time.Second * time.Duration(client.config.GetBlockIntervalInSec) * 2)
+				time.Sleep(time.Second * time.Duration(client.config.SyncClientGetBlockIntervalInSec) * 2)
 				cancel()
 				log.L().Info("Cancel context")
 			}()
@@ -190,7 +190,7 @@ var _ = Describe("Sync Client test", func() {
 			mockManager.On("GetBlock", int64(2)).Return(nil, common.ErrNotFound).Once()
 
 			go func() {
-				time.Sleep(time.Second*time.Duration(client.config.GetBlockIntervalInSec) - time.Microsecond*500)
+				time.Sleep(time.Second*time.Duration(client.config.SyncClientGetBlockIntervalInSec) - time.Microsecond*500)
 				mockManager.On("GetBlock", int64(2)).Return(modelBlocks[2], nil).Once()
 
 				// Get data of block 3 from local
@@ -236,7 +236,7 @@ var _ = Describe("Sync Client test", func() {
 				mockStream.On("Recv").Return(nil, context.Canceled)
 
 				go func() {
-					time.Sleep(time.Second * time.Duration(client.config.GetBlockIntervalInSec) * 2)
+					time.Sleep(time.Second * time.Duration(client.config.SyncClientGetBlockIntervalInSec) * 2)
 					cancel()
 					log.L().Info("Cancel context")
 				}()
@@ -276,7 +276,7 @@ var _ = Describe("Sync Client test", func() {
 			mockManager.On("GetBlock", int64(4)).Return(nil, common.ErrNotFound).Once()
 
 			go func() {
-				time.Sleep(time.Second*time.Duration(client.config.GetBlockIntervalInSec) - time.Microsecond*500)
+				time.Sleep(time.Second*time.Duration(client.config.SyncClientGetBlockIntervalInSec) - time.Microsecond*500)
 				mockManager.On("GetBlock", int64(4)).Return(reorgModelBlocks[4], nil).Once()
 
 				// Check reorg
@@ -394,7 +394,7 @@ var _ = Describe("Sync Client test", func() {
 				mockStream.On("Recv").Return(nil, context.Canceled)
 
 				go func() {
-					time.Sleep(time.Second * time.Duration(client.config.GetBlockIntervalInSec) * 2)
+					time.Sleep(time.Second * time.Duration(client.config.SyncClientGetBlockIntervalInSec) * 2)
 					cancel()
 					log.L().Info("Cancel context")
 				}()

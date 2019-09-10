@@ -17,6 +17,7 @@ import (
 	"github.com/darkknightbk52/btc-indexer/subscriber"
 	"go.uber.org/zap"
 	"sync"
+	"time"
 )
 
 type Indexer struct {
@@ -57,10 +58,13 @@ func (idx *Indexer) Listen(ctx context.Context, fromBlockHeight int64) error {
 		return fmt.Errorf("failed to Subscribe Notification: %v", err)
 	}
 
+	start := time.Now()
+	log.L().Info("Indexer Service started to listen block data", zap.Time("At", start))
 	for {
 		select {
 		case <-listenCtx.Done():
 			wg.Wait()
+			log.L().Info("Indexer Service stopped to listen", zap.Duration("At", time.Since(start)))
 			return listenCtx.Err()
 		case noti := <-notiCh:
 			msg, ok := noti.([][]byte)
@@ -295,7 +299,7 @@ func (idx *Indexer) buildTxData(height int64, tx *wire.MsgTx, isCoinBase bool) (
 		addr, err := common.GetAddrFromTxOut(out, &chainParams)
 		if err != nil {
 			log.L().Warn("failed to Get Address From Tx Out", zap.String("TxHash", tx.TxHash().String()), zap.Int("TxOutIndex", i), zap.Error(err))
-			if !idx.config.IncludeNonStandard {
+			if !idx.config.IndexerIncludeNonStandard {
 				log.L().Warn("Ignore Non Standard Tx Out")
 				continue
 			}

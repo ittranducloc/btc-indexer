@@ -61,14 +61,14 @@ func (c *syncClient) makeHandler(req *proto.SyncRequest) (handler.Handler, error
 		return req.RecentBlocks[len(req.RecentBlocks)-1].Height
 	}()
 
-	if mostRecentBlockHeight == 0 || mostRecentBlockHeight < latestBlock.Height-c.config.SafeDistance {
+	if mostRecentBlockHeight == 0 || mostRecentBlockHeight < latestBlock.Height-c.config.SyncClientSafeDistance {
 		fromHeight := func() int64 {
 			if mostRecentBlockHeight == 0 {
 				return 0
 			}
 			return mostRecentBlockHeight + 1
 		}
-		return handler.NewBatchHandler(c.stream, c.manager, c.addressWatcher, fromHeight(), latestBlock.Height-c.config.SafeDistance), nil
+		return handler.NewBatchHandler(c.stream, c.manager, c.addressWatcher, fromHeight(), latestBlock.Height-c.config.SyncClientSafeDistance), nil
 	}
-	return handler.NewSequenceHandler(c.ctx, c.stream, c.manager, c.addressWatcher, req.RecentBlocks, c.config.GetBlockIntervalInSec), nil
+	return handler.NewSequenceHandler(c.ctx, c.stream, c.manager, c.addressWatcher, req.RecentBlocks, c.config.SyncClientGetBlockIntervalInSec), nil
 }
