@@ -8,6 +8,8 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	. "github.com/onsi/gomega"
+	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
 	"os"
 	"testing"
 )
@@ -23,13 +25,43 @@ var (
 
 func TestMain(m *testing.M) {
 	log.Init(false)
-	var err error
-	store, err = NewPostgresManager("host=localhost port=54321 user=postgres dbname=test password=123@123a sslmode=disable")
+
+	cfg := struct {
+		Host     string
+		Port     int
+		User     string
+		Password string
+		DbName   string
+	}{}
+	file, err := os.Open("./test_config.yml")
 	if err != nil {
+		file, err = os.Open("./default_test_config.yml")
+		if err != nil {
+			log.S().Fatal(err)
+		}
+		log.S().Info("Use Default Test Config")
+	}
+	decoder := yaml.NewDecoder(file)
+	err = decoder.Decode(&cfg)
+	if err != nil {
+		log.S().Fatal(err)
+	}
+
+	dbCfg := Config{
+		User:     cfg.User,
+		Password: cfg.Password,
+		Host:     cfg.Host,
+		Port:     cfg.Port,
+		DBName:   cfg.DbName,
+	}
+	store, err = NewPostgresManager(dbCfg.DSN())
+	if err != nil {
+		log.L().Info("Failed to connect to external Postgres DB", zap.String("DSN", dbCfg.DSN()), zap.Error(err))
 		store, err = newManager("sqlite3", "./gorm.db")
 		if err != nil {
 			log.S().Fatal(err)
 		}
+		log.S().Info("Use Memory DB instead")
 	}
 	db = store.(*manager).db
 
@@ -56,11 +88,17 @@ func clearDB(t *testing.T) {
 func TestNewPostgresManager_Fail(t *testing.T) {
 	RegisterTestingT(t)
 
-	dsn := "host=localhost port=54321 user=postgres dbname=postgres password=123@123a sslmode=disable"
-	_, e := gorm.Open("postgres", dsn)
-	errContent := fmt.Sprintf("failed to Open connection with postgres DB, DSN '%s': %s", dsn, e)
+	dbCfg := Config{
+		User:     "notExisted",
+		Password: "Password",
+		Host:     "Host",
+		Port:     1313,
+		DBName:   "DbName",
+	}
+	_, e := gorm.Open("postgres", dbCfg.DSN())
+	errContent := fmt.Sprintf("failed to Open connection with postgres DB, DSN '%s': %s", dbCfg.DSN(), e)
 
-	_, err := NewPostgresManager(dsn)
+	_, err := NewPostgresManager(dbCfg.DSN())
 	Expect(err).ShouldNot(Succeed())
 	Expect(err.Error()).Should(Equal(errContent))
 

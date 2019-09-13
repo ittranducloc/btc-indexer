@@ -6,22 +6,45 @@ import (
 	"github.com/darkknightbk52/btc-indexer/common/log"
 	. "github.com/onsi/gomega"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
 	"os"
 	"sync"
 	"testing"
 )
 
-var client Client
+var (
+	client Client
+	cfg    Config
+)
 
 func TestMain(m *testing.M) {
 	log.Init(false)
 
+	testCfg := struct {
+		Host string
+		User string
+		Pass string
+	}{}
+	file, err := os.Open("./test_config.yml")
+	if err != nil {
+		file, err = os.Open("./default_test_config.yml")
+		if err != nil {
+			log.S().Fatal(err)
+		}
+		log.S().Info("Use Default Test Config")
+	}
+	decoder := yaml.NewDecoder(file)
+	err = decoder.Decode(&testCfg)
+	if err != nil {
+		log.S().Fatal(err)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	var wg sync.WaitGroup
-	cfg := Config{
-		BlockchainClientHost: "10.2.3.205:18332",
-		BlockchainClientUser: "bitcoin",
-		BlockchainClientPass: "local321",
+	cfg = Config{
+		BlockchainClientHost: testCfg.Host,
+		BlockchainClientUser: testCfg.User,
+		BlockchainClientPass: testCfg.Pass,
 	}
 	c, err := NewBlockchainClient(ctx, &wg, cfg, chaincfg.TestNet3Params)
 	if err != nil {
@@ -39,7 +62,7 @@ func TestNewBlockchainClient_Failed(t *testing.T) {
 	RegisterTestingT(t)
 
 	_, err := NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
-		BlockchainClientHost: "localhost:18332",
+		BlockchainClientHost: "notExisted:18332",
 		BlockchainClientUser: "user",
 		BlockchainClientPass: "pass",
 	}, chaincfg.MainNetParams)
@@ -47,19 +70,31 @@ func TestNewBlockchainClient_Failed(t *testing.T) {
 	log.S().Info(err)
 
 	_, err = NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
-		BlockchainClientHost: "10.2.3.205:18332",
-		BlockchainClientUser: "user",
+		BlockchainClientHost: cfg.BlockchainClientHost,
+		BlockchainClientUser: "userNotExisted",
 		BlockchainClientPass: "pass",
 	}, chaincfg.MainNetParams)
 	Expect(err).ShouldNot(Succeed())
 	log.S().Info(err)
 
-	_, err = NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
-		BlockchainClientHost: "10.2.3.205:18332",
-		BlockchainClientUser: "bitcoin",
-		BlockchainClientPass: "local321",
-	}, chaincfg.MainNetParams)
-	Expect(err).ShouldNot(Succeed())
+	isFailed := false
+	if _, err = NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
+		BlockchainClientHost: cfg.BlockchainClientHost,
+		BlockchainClientUser: cfg.BlockchainClientUser,
+		BlockchainClientPass: cfg.BlockchainClientPass,
+	}, chaincfg.MainNetParams); err == nil {
+		_, err = NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
+			BlockchainClientHost: cfg.BlockchainClientHost,
+			BlockchainClientUser: cfg.BlockchainClientUser,
+			BlockchainClientPass: cfg.BlockchainClientPass,
+		}, chaincfg.TestNet3Params)
+		if err != nil {
+			isFailed = true
+		}
+	} else {
+		isFailed = true
+	}
+	Expect(isFailed).Should(BeTrue())
 	log.S().Info(err)
 }
 

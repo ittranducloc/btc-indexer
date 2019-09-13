@@ -1,0 +1,5 @@
+# Who run test, should clone this file to a new file "test_config.yml" at the current directory and fill these config fields according to the running environment
+# If "test_config.yml" not exist, this default file will be loaded
+host: localhost:18332
+user: bitcoin
+pass: local321

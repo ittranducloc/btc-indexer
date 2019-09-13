@@ -7,6 +7,8 @@ import (
 	"github.com/darkknightbk52/btc-indexer/common/log"
 	. "github.com/onsi/gomega"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -16,7 +18,24 @@ func TestSubscribe(t *testing.T) {
 	RegisterTestingT(t)
 	log.Init(false)
 
-	sub := NewSubscriber(BtcUrl("tcp://10.2.3.205:28332"),
+	cfg := struct {
+		Url string
+	}{}
+	file, err := os.Open("./test_config.yml")
+	if err != nil {
+		file, err = os.Open("./default_test_config.yml")
+		if err != nil {
+			log.S().Fatal(err)
+		}
+		log.S().Info("Use Default Test Config")
+	}
+	decoder := yaml.NewDecoder(file)
+	err = decoder.Decode(&cfg)
+	if err != nil {
+		log.S().Fatal(err)
+	}
+
+	sub := NewSubscriber(BtcUrl(cfg.Url),
 		TimeoutDuration(time.Second*10),
 		RetryDuration(time.Second*5))
 
@@ -48,7 +67,7 @@ func TestSubscribe(t *testing.T) {
 		}
 	}()
 
-	err := sub.SubscribeNotification(ctx, wg, ch)
+	err = sub.SubscribeNotification(ctx, wg, ch)
 	Expect(err).Should(Succeed())
 
 	select {}
