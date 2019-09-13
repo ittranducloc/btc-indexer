@@ -9,6 +9,7 @@ import (
 	"github.com/btcsuite/btcd/wire"
 	"github.com/darkknightbk52/btc-indexer/model"
 	proto "github.com/darkknightbk52/btc-indexer/proto"
+	"strings"
 )
 
 func ToBlock(header *btcjson.GetBlockHeaderVerboseResult) *model.Block {
@@ -99,4 +100,17 @@ func BuildProtoMsg(height int64, block *model.Block, txIns []*model.TxIn, txOuts
 	}
 
 	return msg
+}
+
+func GenerateSqlValuesPart(columnNo, rowNo int) string {
+	questionMasks := make([]string, 0, columnNo)
+	for i := 0; i < columnNo; i++ {
+		questionMasks = append(questionMasks, "?")
+	}
+	partForOneColumn := fmt.Sprintf("(%s)", strings.Join(questionMasks, ","))
+	columnParts := make([]string, 0, rowNo)
+	for i := 0; i < rowNo; i++ {
+		columnParts = append(columnParts, partForOneColumn)
+	}
+	return strings.Join(columnParts, ",")
 }
