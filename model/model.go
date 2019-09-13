@@ -69,8 +69,8 @@ type TxOut struct {
 	TxHash       string `gorm:"type:varchar(64);not null"`
 	TxIndex      int32  `gorm:"not null"`
 	Value        int64  `gorm:"not null"`
-	Address      string `gorm:"type:varchar(62);not null;"` // max length of a bech32 address
-	ScriptPubKey []byte `gorm:"not null"`                   // max length 16 MB
+	Address      string `gorm:"type:varchar(62);not null"` // max length of a bech32 address
+	ScriptPubKey []byte `gorm:"not null"`                  // max length 16 MB
 	CoinBase     *bool  `gorm:"not null;default:false"`
 }
 

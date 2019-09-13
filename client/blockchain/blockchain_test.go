@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"context"
+	"encoding/hex"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/darkknightbk52/btc-indexer/common/log"
 	. "github.com/onsi/gomega"
@@ -42,9 +43,9 @@ func TestMain(m *testing.M) {
 	ctx, cancel := context.WithCancel(context.Background())
 	var wg sync.WaitGroup
 	cfg = Config{
-		BlockchainClientHost: testCfg.Host,
-		BlockchainClientUser: testCfg.User,
-		BlockchainClientPass: testCfg.Pass,
+		Host: testCfg.Host,
+		User: testCfg.User,
+		Pass: testCfg.Pass,
 	}
 	c, err := NewBlockchainClient(ctx, &wg, cfg, chaincfg.TestNet3Params)
 	if err != nil {
@@ -62,31 +63,31 @@ func TestNewBlockchainClient_Failed(t *testing.T) {
 	RegisterTestingT(t)
 
 	_, err := NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
-		BlockchainClientHost: "notExisted:18332",
-		BlockchainClientUser: "user",
-		BlockchainClientPass: "pass",
+		Host: "notExisted:18332",
+		User: "user",
+		Pass: "pass",
 	}, chaincfg.MainNetParams)
 	Expect(err).ShouldNot(Succeed())
 	log.S().Info(err)
 
 	_, err = NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
-		BlockchainClientHost: cfg.BlockchainClientHost,
-		BlockchainClientUser: "userNotExisted",
-		BlockchainClientPass: "pass",
+		Host: cfg.Host,
+		User: "userNotExisted",
+		Pass: "pass",
 	}, chaincfg.MainNetParams)
 	Expect(err).ShouldNot(Succeed())
 	log.S().Info(err)
 
 	isFailed := false
 	if _, err = NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
-		BlockchainClientHost: cfg.BlockchainClientHost,
-		BlockchainClientUser: cfg.BlockchainClientUser,
-		BlockchainClientPass: cfg.BlockchainClientPass,
+		Host: cfg.Host,
+		User: cfg.User,
+		Pass: cfg.Pass,
 	}, chaincfg.MainNetParams); err == nil {
 		_, err = NewBlockchainClient(context.Background(), &sync.WaitGroup{}, Config{
-			BlockchainClientHost: cfg.BlockchainClientHost,
-			BlockchainClientUser: cfg.BlockchainClientUser,
-			BlockchainClientPass: cfg.BlockchainClientPass,
+			Host: cfg.Host,
+			User: cfg.User,
+			Pass: cfg.Pass,
 		}, chaincfg.TestNet3Params)
 		if err != nil {
 			isFailed = true
@@ -122,4 +123,16 @@ func TestBlockchainClient_GetRawBlock(t *testing.T) {
 	Expect(err).Should(Succeed())
 	Expect(block.BlockHash().String()).Should(Equal("0000000092c69507e1628a6a91e4e69ea28fe378a1a6a636b9c3157e84c71b78"))
 	log.L().Info("GetRawBlock", zap.Any("block", block))
+}
+
+func Test(t *testing.T) {
+	RegisterTestingT(t)
+	block, err := client.GetRawBlock("0000000000018278632a43fa935115fd032da5eb190e6a6766fcd859c6c32495")
+	Expect(err).Should(Succeed())
+	for _, tx := range block.Transactions {
+		log.L().Info("Tx", zap.String("Hash", tx.TxHash().String()))
+		for i, txOut := range tx.TxOut {
+			log.L().Info("TxOut", zap.Int("Index", i), zap.String("PkScript", hex.EncodeToString(txOut.PkScript)))
+		}
+	}
 }

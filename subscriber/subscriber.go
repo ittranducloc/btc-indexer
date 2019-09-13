@@ -20,12 +20,12 @@ const (
 )
 
 type subscriber struct {
-	opts SubscriberOptions
+	opts Options
 }
 
-func NewSubscriber(opts ...SubscriberOption) Subscriber {
-	options := SubscriberOptions{
-		TimeoutInSecond:   DefaultRetryTimeInSecond,
+func NewSubscriber(opts ...Option) Subscriber {
+	options := Options{
+		TimeoutInSecond:   DefaultTimeoutInSecond,
 		RetryTimeInSecond: DefaultRetryTimeInSecond,
 	}
 	for _, o := range opts {
@@ -39,7 +39,7 @@ func NewSubscriber(opts ...SubscriberOption) Subscriber {
 
 func (s *subscriber) SubscribeNotification(ctx context.Context, wg *sync.WaitGroup, ch chan<- interface{}) error {
 	go s.subscribe(ctx, wg, "rawblock", ch)
-	go s.subscribe(ctx, wg, "rawtx", ch)
+	//go s.subscribe(ctx, wg, "rawtx", ch)
 	return nil
 }
 
@@ -86,6 +86,7 @@ func (s *subscriber) receive(ctx context.Context, topic string, ch chan<- interf
 				}
 				return
 			case ch <- msg:
+				continue
 			}
 		}
 

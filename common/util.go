@@ -63,7 +63,7 @@ func GetAddrFromTxOut(out *wire.TxOut, chainParams *chaincfg.Params) (string, er
 	}
 
 	if len(addrs) == 0 {
-		return model.NonStandardAddr, fmt.Errorf("failed to Extract Public Key Script: empty addresses")
+		return model.NonStandardAddr, nil
 	}
 	return addrs[0].String(), nil
 }

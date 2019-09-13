@@ -3,6 +3,7 @@ package store
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Config struct {
@@ -14,14 +15,24 @@ type Config struct {
 }
 
 func (c *Config) Validate() error {
-	if c.User == "" {
-		return errors.New("database user is required")
+	var errContents []string
+	if len(c.User) == 0 {
+		errContents = append(errContents, "DB User required")
 	}
-	if c.Host == "" {
-		return errors.New("database address is required")
+	if len(c.Password) == 0 {
+		errContents = append(errContents, "DB Password required")
 	}
-	if c.DBName == "" {
-		return errors.New("database name is required")
+	if len(c.Host) == 0 {
+		errContents = append(errContents, "DB Host required")
+	}
+	if c.Port == 0 {
+		errContents = append(errContents, "DB Port required")
+	}
+	if len(c.DBName) == 0 {
+		errContents = append(errContents, "DB Name required")
+	}
+	if len(errContents) > 0 {
+		return errors.New(strings.Join(errContents, ", "))
 	}
 	return nil
 }

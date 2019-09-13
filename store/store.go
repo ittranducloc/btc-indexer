@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"github.com/darkknightbk52/btc-indexer/common"
 	"github.com/darkknightbk52/btc-indexer/model"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -51,12 +52,18 @@ func newManager(dialect, dsn string) (Manager, error) {
 func (m *manager) GetLatestBlock() (*model.Block, error) {
 	b := new(model.Block)
 	err := m.db.Order("height DESC").Limit(1).First(b).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, common.ErrNotFound
+	}
 	return b, err
 }
 
 func (m *manager) GetBlock(height int64) (*model.Block, error) {
 	b := new(model.Block)
 	err := m.db.Where(model.Block{Height: height}).First(b).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, common.ErrNotFound
+	}
 	return b, err
 }
 

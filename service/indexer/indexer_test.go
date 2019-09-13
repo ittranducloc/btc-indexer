@@ -38,8 +38,7 @@ var _ = Describe("Indexer Test", func() {
 		mockManager = new(managerMock.Manager)
 		indexer = &Indexer{
 			config: Config{
-				IndexerNetwork:     "TestNet3",
-				IndexerFullNodeUrl: "localhost",
+				Network: "TestNet3",
 			},
 			netParams:  chaincfg.TestNet3Params,
 			subscriber: mockSubscriber,

@@ -30,7 +30,7 @@ type Indexer struct {
 }
 
 const (
-	blockBatchSize = 50
+	blockBatchSize = 5
 )
 
 func NewIndexer(config Config, subscriber subscriber.Subscriber, manager store.Manager, client bcClient.Client) *Indexer {
@@ -59,7 +59,7 @@ func (idx *Indexer) Listen(ctx context.Context, fromBlockHeight int64) error {
 	}
 
 	start := time.Now()
-	log.L().Info("Indexer Service started to listen block data", zap.Time("At", start))
+	log.L().Info("Indexer Service started to listen block data", zap.Int64("Current Height", idx.currentBlock.Height), zap.String("Current Hash", idx.currentBlock.Hash), zap.Time("At", start))
 	for {
 		select {
 		case <-listenCtx.Done():
@@ -119,6 +119,10 @@ func (idx *Indexer) syncBlock(rawBlock *wire.MsgBlock, sequence uint32) error {
 		return fmt.Errorf("failed to Get Block Header Verbose By Hash '%s': %v", rawBlock.BlockHash().String(), err)
 	}
 
+	log.L().Info("Block Msg processing",
+		zap.Int32("Target Height", targetBlockHeader.Height), zap.String("Target Hash", targetBlockHeader.Hash),
+		zap.Int64("Current Height", idx.currentBlock.Height), zap.String("Current Hash", idx.currentBlock.Hash))
+
 	targetBlockHeight := int64(targetBlockHeader.Height)
 	for idx.currentBlock.Height < targetBlockHeight {
 		nextBlockHeader := targetBlockHeader
@@ -130,6 +134,11 @@ func (idx *Indexer) syncBlock(rawBlock *wire.MsgBlock, sequence uint32) error {
 			}
 			nextBlockHeader = header
 		}
+
+		log.L().Info("Block Msg processing in batch",
+			zap.Int32("Target Height", nextBlockHeader.Height), zap.String("Target Hash", nextBlockHeader.Hash),
+			zap.Int64("Current Height", idx.currentBlock.Height), zap.String("Current Hash", idx.currentBlock.Hash))
+
 		header, err := idx.syncBlockMaybeReorg(nextBlockHeader)
 		if err != nil {
 			return fmt.Errorf("failed to Sync Block Maybe Reorg, to Height '%d': %v", nextBlockHeader.Height, err)
@@ -137,7 +146,11 @@ func (idx *Indexer) syncBlock(rawBlock *wire.MsgBlock, sequence uint32) error {
 		if header != nil {
 			idx.currentBlock = common.ToBlock(header)
 		}
+
+		log.L().Info("Block Msg processed in batch completely", zap.Int64("Current Height", idx.currentBlock.Height), zap.String("Current Hash", idx.currentBlock.Hash))
 	}
+
+	log.L().Info("Block Msg processed completely", zap.Int64("Current Height", idx.currentBlock.Height), zap.String("Current Hash", idx.currentBlock.Hash))
 	return nil
 }
 
@@ -299,10 +312,11 @@ func (idx *Indexer) buildTxData(height int64, tx *wire.MsgTx, isCoinBase bool) (
 		addr, err := common.GetAddrFromTxOut(out, &chainParams)
 		if err != nil {
 			log.L().Warn("failed to Get Address From Tx Out", zap.String("TxHash", tx.TxHash().String()), zap.Int("TxOutIndex", i), zap.Error(err))
-			if !idx.config.IndexerIncludeNonStandard {
-				log.L().Warn("Ignore Non Standard Tx Out")
-				continue
-			}
+		}
+
+		if addr == model.NonStandardAddr && !idx.config.IncludeNonStandard {
+			log.L().Warn("Ignore Non Standard Tx Out")
+			continue
 		}
 		txOuts = append(txOuts, &model.TxOut{
 			Height:       height,

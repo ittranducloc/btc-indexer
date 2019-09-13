@@ -24,9 +24,9 @@ type blockchainClient struct {
 
 func NewBlockchainClient(ctx context.Context, wg *sync.WaitGroup, cfg Config, chainParams chaincfg.Params) (Client, error) {
 	connCfg := &rpcclient.ConnConfig{
-		Host:                 cfg.BlockchainClientHost,
-		User:                 cfg.BlockchainClientUser,
-		Pass:                 cfg.BlockchainClientPass,
+		Host:                 cfg.Host,
+		User:                 cfg.User,
+		Pass:                 cfg.Pass,
 		DisableAutoReconnect: false,
 		DisableTLS:           true,
 		DisableConnectOnNew:  true,

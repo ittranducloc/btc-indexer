@@ -2,31 +2,31 @@ package blockchain
 
 import (
 	"errors"
-	"fmt"
+	"strings"
 )
 
 type Config struct {
-	BlockchainClientHost string
-	BlockchainClientUser string
-	BlockchainClientPass string
+	Host string
+	User string
+	Pass string
 }
 
 func (c Config) Validate() error {
-	var errContent string
-	if len(c.BlockchainClientHost) == 0 {
-		errContent = "Host config for Blockchain Client is required"
+	var errContents []string
+	if len(c.Host) == 0 {
+		errContents = append(errContents, "Host config for Blockchain Client is required")
 	}
 
-	if len(c.BlockchainClientUser) == 0 {
-		errContent = fmt.Sprintf("%s, %s", errContent, "User config for Blockchain Client is required")
+	if len(c.User) == 0 {
+		errContents = append(errContents, "User config for Blockchain Client is required")
 	}
 
-	if len(c.BlockchainClientPass) == 0 {
-		errContent = fmt.Sprintf("%s, %s", errContent, "Pass config for Blockchain Client is required")
+	if len(c.Pass) == 0 {
+		errContents = append(errContents, "Pass config for Blockchain Client is required")
 	}
 
-	if len(errContent) > 0 {
-		return errors.New(errContent)
+	if len(errContents) > 0 {
+		return errors.New(strings.Join(errContents, ", "))
 	}
 
 	return nil

@@ -35,7 +35,7 @@ func TestSubscribe(t *testing.T) {
 		log.S().Fatal(err)
 	}
 
-	sub := NewSubscriber(BtcUrl(cfg.Url),
+	sub := NewSubscriber(Url(cfg.Url),
 		TimeoutDuration(time.Second*10),
 		RetryDuration(time.Second*5))
 

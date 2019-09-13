@@ -2,28 +2,28 @@ package subscriber
 
 import "time"
 
-type SubscriberOptions struct {
+type Options struct {
 	Url               string
 	TimeoutInSecond   time.Duration
 	RetryTimeInSecond time.Duration
 }
 
-type SubscriberOption func(*SubscriberOptions)
+type Option func(*Options)
 
-func BtcUrl(url string) SubscriberOption {
-	return func(options *SubscriberOptions) {
+func Url(url string) Option {
+	return func(options *Options) {
 		options.Url = url
 	}
 }
 
-func TimeoutDuration(timeoutInSecond time.Duration) SubscriberOption {
-	return func(options *SubscriberOptions) {
+func TimeoutDuration(timeoutInSecond time.Duration) Option {
+	return func(options *Options) {
 		options.TimeoutInSecond = timeoutInSecond
 	}
 }
 
-func RetryDuration(retryTimeInSecond time.Duration) SubscriberOption {
-	return func(options *SubscriberOptions) {
+func RetryDuration(retryTimeInSecond time.Duration) Option {
+	return func(options *Options) {
 		options.RetryTimeInSecond = retryTimeInSecond
 	}
 }
