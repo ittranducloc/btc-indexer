@@ -260,8 +260,8 @@
   name = "github.com/hashicorp/serf"
   packages = ["coordinate"]
   pruneopts = "UT"
-  revision = "15cfd05de3dffb3664aa37b06e91f970b825e380"
-  version = "v0.8.3"
+  revision = "d0144799968225d12af441bef64e45c9740b95eb"
+  version = "v0.8.4"
 
 [[projects]]
   branch = "master"
@@ -355,12 +355,12 @@
   version = "v0.12.0"
 
 [[projects]]
-  digest = "1:cb58609eb30697c5244702926b8b56700340fe822a0e4cfe979da4cfcf6da0d9"
+  digest = "1:75f1f2818303679c5cf7ae4ed0f5ba0f954b3499b8a7ff900fbaa644c2ce045c"
   name = "github.com/marten-seemann/qtls"
   packages = ["."]
   pruneopts = "UT"
-  revision = "83d1e691eac8bbfaf8562d5b61d8de406f7ba2f6"
-  version = "v0.4.0"
+  revision = "9ebf95d1b00d2f87c80c17d94771035d3fe188b8"
+  version = "v0.3.3"
 
 [[projects]]
   digest = "1:79e87abf06b873987dee86598950f5b51732ac454d5a5cab6445a14330e6c9e3"
@@ -684,11 +684,11 @@
     "ripemd160",
   ]
   pruneopts = "UT"
-  revision = "227b76d455e791cb042b03e633e2f7fbcfdf74a5"
+  revision = "9ee001bba392397c76f100a2d5b13afc86f167f1"
 
 [[projects]]
   branch = "master"
-  digest = "1:afcc8e1697ed5c5785830b9fcc80b1f09d14f038bcacd5f6fe533e77c34947d7"
+  digest = "1:45643688b3a56b74e5d5a6653b905403af37d5aedf4a034eb6b85dd4b65c667c"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -709,11 +709,11 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "24e19bdeb0f2d062d8e2640d50a7aaf2a7f80e7a"
+  revision = "aa69164e4478b84860dc6769c710c699c67058a3"
 
 [[projects]]
   branch = "master"
-  digest = "1:55aac9cb3f24f72ab39c28a92666273a4c5df9ab6c30db06a8a5507d47cf667e"
+  digest = "1:8f389e6462af41a708f74e09d4a07b62404d7e00debf9121aef6f4cb7f7ca82a"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -721,7 +721,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "bc967efca4b87fb45e946a3ea4cb891883404fd0"
+  revision = "2aa67d56cdd77167a5fb51358e8c3ce04bad68bb"
 
 [[projects]]
   digest = "1:28deae5fe892797ff37a317b5bcda96d11d1c90dadd89f1337651df3bc4c586e"
@@ -766,7 +766,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "1774047e7e5133fa3573a4e51b37a586b6b0360c"
+  revision = "f660b865573183437d2d868f703fe88bb8af0b55"
 
 [[projects]]
   digest = "1:2e18183989c76d073e9088f1a56f8b1c46ca920b74b529a50c2d7e5877ff18ac"
@@ -849,12 +849,14 @@
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/jinzhu/gorm/dialects/sqlite",
     "github.com/lightninglabs/gozmq",
+    "github.com/marten-seemann/qtls",
     "github.com/micro/cli",
     "github.com/micro/go-micro",
     "github.com/micro/go-micro/client",
     "github.com/micro/go-micro/config",
     "github.com/micro/go-micro/config/source/env",
     "github.com/micro/go-micro/errors",
+    "github.com/micro/go-micro/registry/consul",
     "github.com/micro/go-micro/server",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",

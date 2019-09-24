@@ -62,6 +62,10 @@
   version = "1.4.0"
 
 [[constraint]]
+  name = "github.com/marten-seemann/qtls"
+  version = "0.3.2"
+
+[[constraint]]
   name = "go.uber.org/zap"
   version = "1.10.0"
 
