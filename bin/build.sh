@@ -21,6 +21,9 @@ function build_single() {
   echo -e ">> \e[32;5mbuilding $APP_NAME ...\e[0m"
   cd "$1" || exit
   time go build -ldflags "-s -w" || return $?
+  DEST_DIR="${BUILD_DIR}/docker/${APP_NAME}/"
+  cp -f "$APP_NAME" "$DEST_DIR"
+  cd "$DEST_DIR" || exit
   ls -lh "$APP_NAME"
 }
 
