@@ -30,7 +30,7 @@ type Indexer struct {
 }
 
 const (
-	blockBatchSize = 5
+	blockBatchSize = 100
 )
 
 func NewIndexer(config Config, subscriber subscriber.Subscriber, manager store.Manager, client bcClient.Client) *Indexer {
